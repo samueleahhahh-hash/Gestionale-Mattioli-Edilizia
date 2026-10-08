@@ -2,21 +2,139 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
 <title>Gestionale Edilizia</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f2f2f7;color:#111}
-header{background:#111;color:white;padding:25px 20px 20px;font-size:28px;font-weight:700}
-main{padding:18px;max-width:700px;margin:auto}
-.card{background:white;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
-h2{margin:0 0 15px}input,select{width:100%;padding:13px;margin:6px 0 10px;border:1px solid #ddd;border-radius:10px;font-size:16px}
-button{border:0;border-radius:12px;padding:13px 18px;font-size:16px;font-weight:600;background:#111;color:white;margin-top:5px}
-.green{background:#299447}.red{background:#d33}.back{background:#777}
-.total{font-size:25px;font-weight:700;margin-top:10px}.extra{border-top:1px solid #eee;padding:12px 0}
-.small{color:#666;font-size:14px}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f2f2f7;
+  color:#111;
+}
+
+header{
+  background:#111;
+  color:#fff;
+  padding:24px 18px 20px;
+  font-size:28px;
+  font-weight:800;
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+main{
+  padding:16px;
+  max-width:760px;
+  margin:auto;
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 2px 10px #00000012;
+}
+
+h2{margin:0 0 15px;font-size:22px}
+h3{margin:18px 0 10px}
+
+input{
+  width:100%;
+  padding:13px;
+  margin:5px 0 10px;
+  border:1px solid #ddd;
+  border-radius:11px;
+  font-size:16px;
+  background:#fff;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:12px 16px;
+  font-size:16px;
+  font-weight:700;
+  background:#111;
+  color:#fff;
+  margin:4px 4px 4px 0;
+}
+
+.green{background:#299447}
+.red{background:#d33}
+.blue{background:#2878d8}
+.gray{background:#777}
+.light{background:#e9e9ee;color:#111}
+
+.small{
+  color:#666;
+  font-size:14px;
+}
+
 .hidden{display:none}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.kpi{
+  padding:14px;
+  border-radius:14px;
+  background:#f5f5f7;
+}
+
+.kpi b{
+  display:block;
+  font-size:21px;
+  margin-top:3px;
+}
+
+.profit{background:#e9f7ed}
+.loss{background:#fff0f0}
+
+.total{
+  font-size:26px;
+  font-weight:800;
+  margin-top:12px;
+}
+
+.item{
+  border-top:1px solid #eee;
+  padding:13px 0;
+}
+
+.item:first-child{
+  border-top:0;
+}
+
+.actions{
+  margin-top:7px;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:8px;
+  background:#eee;
+  font-size:12px;
+  font-weight:700;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #eee;
+  margin:16px 0;
+}
 </style>
 </head>
+
 <body>
 
 <header>Gestionale Edilizia</header>
@@ -24,134 +142,1472 @@ button{border:0;border-radius:12px;padding:13px 18px;font-size:16px;font-weight:
 <main>
 
 <section id="home">
-<div class="card">
-<h2>🏗️ Nuovo cantiere</h2>
-<input id="nome" placeholder="Nome cantiere">
-<input id="cliente" placeholder="Cliente">
-<input id="indirizzo" placeholder="Indirizzo">
-<button class="green" onclick="nuovoCantiere()">+ Crea cantiere</button>
-</div>
 
-<div class="card">
-<h2>📋 I miei cantieri</h2>
-<div id="lista"></div>
-</div>
+  <div class="card">
+
+    <h2>🏗️ Nuovo cantiere</h2>
+
+    <input id="nome" placeholder="Nome cantiere">
+
+    <input id="cliente" placeholder="Cliente">
+
+    <input id="indirizzo" placeholder="Indirizzo">
+
+    <input
+      id="preventivo"
+      type="number"
+      step="0.01"
+      placeholder="Importo preventivo €"
+    >
+
+    <button class="green" onclick="nuovoCantiere()">
+      + Crea cantiere
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>📊 Situazione generale</h2>
+
+    <div class="grid">
+
+      <div class="kpi">
+        <span class="small">Ricavi</span>
+        <b id="homeRicavi">€ 0,00</b>
+      </div>
+
+      <div class="kpi">
+        <span class="small">Spese</span>
+        <b id="homeSpese">€ 0,00</b>
+      </div>
+
+      <div class="kpi profit">
+        <span class="small">Guadagno</span>
+        <b id="homeGuadagno">€ 0,00</b>
+      </div>
+
+      <div class="kpi">
+        <span class="small">Cantieri</span>
+        <b id="homeCantieri">0</b>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>📋 I miei cantieri</h2>
+
+    <div id="lista"></div>
+
+  </div>
+
 </section>
 
+
 <section id="cantiere" class="hidden">
-<button class="back" onclick="home()">← Cantieri</button>
 
-<div class="card">
-<h2 id="titolo"></h2>
-<div id="info" class="small"></div>
-</div>
+  <button class="gray" onclick="home()">
+    ← Cantieri
+  </button>
 
-<div class="card">
-<h2>➕ Lavorazione extra</h2>
-<input id="descrizione" placeholder="Descrizione lavorazione">
-<input id="materiali" type="number" step="0.01" placeholder="Materiali €">
-<input id="ore" type="number" step="0.1" placeholder="Ore lavoro">
-<input id="costoOra" type="number" step="0.01" placeholder="Costo €/ora">
-<input id="km" type="number" step="0.1" placeholder="Km">
-<input id="costoKm" type="number" step="0.01" placeholder="Costo €/km">
-<input id="macchine" type="number" step="0.01" placeholder="Macchinari €">
-<button class="green" onclick="aggiungiExtra()">+ Aggiungi extra</button>
-</div>
 
-<div class="card">
-<h2>💰 Riepilogo</h2>
-<div id="extra"></div>
-<div class="total">Totale: € <span id="totale">0.00</span></div>
-</div>
+  <div class="card">
+
+    <h2 id="titolo"></h2>
+
+    <div class="small" id="sottotitolo"></div>
+
+    <hr>
+
+    <h3>✏️ Dati cantiere</h3>
+
+    <input id="editNome" placeholder="Nome cantiere">
+
+    <input id="editCliente" placeholder="Cliente">
+
+    <input id="editIndirizzo" placeholder="Indirizzo">
+
+    <button class="blue" onclick="salvaDatiCantiere()">
+      Salva modifiche
+    </button>
+
+    <button class="red" onclick="eliminaCantiere()">
+      Elimina cantiere
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>💰 Ricavi</h2>
+
+    <label class="small">
+      Preventivo iniziale
+    </label>
+
+    <input
+      id="editPreventivo"
+      type="number"
+      step="0.01"
+      oninput="aggiornaPreventivo()"
+    >
+
+    <label class="small">
+      Variazioni / modifiche al preventivo
+    </label>
+
+    <input
+      id="editVariazioni"
+      type="number"
+      step="0.01"
+      oninput="aggiornaVariazioni()"
+    >
+
+    <div class="small">
+      Gli extra vengono aggiunti automaticamente ai ricavi
+      quando inserisci il loro importo da fatturare.
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>➕ Nuovo extra</h2>
+
+    <input
+      id="exDescrizione"
+      placeholder="Descrizione extra"
+    >
+
+    <label class="small">
+      Importo da fatturare al cliente
+    </label>
+
+    <input
+      id="exRicavo"
+      type="number"
+      step="0.01"
+      placeholder="Ricavo extra €"
+    >
+
+    <div class="grid">
+
+      <input
+        id="exMateriali"
+        type="number"
+        step="0.01"
+        placeholder="Materiali €"
+      >
+
+      <input
+        id="exOre"
+        type="number"
+        step="0.1"
+        placeholder="Ore lavoro"
+      >
+
+      <input
+        id="exCostoOra"
+        type="number"
+        step="0.01"
+        placeholder="Costo €/ora"
+      >
+
+      <input
+        id="exKm"
+        type="number"
+        step="0.1"
+        placeholder="Km"
+      >
+
+      <input
+        id="exCostoKm"
+        type="number"
+        step="0.01"
+        placeholder="Costo €/km"
+      >
+
+      <input
+        id="exMacchine"
+        type="number"
+        step="0.01"
+        placeholder="Macchinari €"
+      >
+
+    </div>
+
+    <input
+      id="exAltreSpese"
+      type="number"
+      step="0.01"
+      placeholder="Altre spese €"
+    >
+
+    <button class="green" onclick="aggiungiExtra()">
+      + Aggiungi extra
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>💸 Altre spese</h2>
+
+    <input
+      id="spDescrizione"
+      placeholder="Descrizione spesa"
+    >
+
+    <input
+      id="spImporto"
+      type="number"
+      step="0.01"
+      placeholder="Importo €"
+    >
+
+    <button class="green" onclick="aggiungiSpesa()">
+      + Aggiungi spesa
+    </button>
+
+    <div id="spese"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>📈 Riepilogo economico</h2>
+
+    <div class="grid">
+
+      <div class="kpi">
+        <span class="small">
+          Preventivo + variazioni
+        </span>
+        <b id="riepBase">€ 0,00</b>
+      </div>
+
+      <div class="kpi">
+        <span class="small">
+          Extra fatturati
+        </span>
+        <b id="riepExtraRicavi">€ 0,00</b>
+      </div>
+
+      <div class="kpi">
+        <span class="small">
+          Totale ricavi
+        </span>
+        <b id="riepRicavi">€ 0,00</b>
+      </div>
+
+      <div class="kpi">
+        <span class="small">
+          Totale spese
+        </span>
+        <b id="riepSpese">€ 0,00</b>
+      </div>
+
+    </div>
+
+    <div
+      id="boxGuadagno"
+      class="kpi profit"
+      style="margin-top:10px"
+    >
+
+      <span class="small">
+        GUADAGNO
+      </span>
+
+      <b
+        id="riepGuadagno"
+        class="total"
+      >
+        € 0,00
+      </b>
+
+      <div
+        class="small"
+        id="riepMargine"
+      >
+        Margine: 0%
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>🧾 Extra</h2>
+
+    <div id="extra"></div>
+
+  </div>
+
 </section>
 
 </main>
 
-<script>
-let dati=JSON.parse(localStorage.getItem("cantieri")||"[]");
-let corrente=null;
 
-function salva(){localStorage.setItem("cantieri",JSON.stringify(dati));}
+<script>
+
+let dati =
+  JSON.parse(
+    localStorage.getItem("cantieri") || "[]"
+  );
+
+let corrente = null;
+
+
+function euro(v){
+
+  return new Intl.NumberFormat(
+    "it-IT",
+    {
+      style:"currency",
+      currency:"EUR"
+    }
+  ).format(Number(v)||0);
+
+}
+
+
+function num(id){
+
+  return Number(
+    document.getElementById(id).value
+  ) || 0;
+
+}
+
+
+function salva(){
+
+  localStorage.setItem(
+    "cantieri",
+    JSON.stringify(dati)
+  );
+
+}
+
+
+function totaleSpeseExtra(e){
+
+  return (
+    (Number(e.materiali)||0) +
+    (Number(e.ore)||0) *
+    (Number(e.costoOra)||0) +
+    (Number(e.km)||0) *
+    (Number(e.costoKm)||0) +
+    (Number(e.macchine)||0) +
+    (Number(e.altreSpese)||0)
+  );
+
+}
+
+
+function normalizza(){
+
+  dati.forEach(c=>{
+
+    c.preventivo = Number(c.preventivo)||0;
+
+    c.variazioni = Number(c.variazioni)||0;
+
+    c.extra =
+      Array.isArray(c.extra)
+      ? c.extra
+      : [];
+
+    c.spese =
+      Array.isArray(c.spese)
+      ? c.spese
+      : [];
+
+
+    c.extra.forEach(e=>{
+
+      if(e.d!==undefined && e.descrizione===undefined)
+        e.descrizione=e.d;
+
+      if(e.m!==undefined && e.materiali===undefined)
+        e.materiali=e.m;
+
+      if(e.o!==undefined && e.ore===undefined)
+        e.ore=e.o;
+
+      if(e.co!==undefined && e.costoOra===undefined)
+        e.costoOra=e.co;
+
+      if(e.ck!==undefined && e.costoKm===undefined)
+        e.costoKm=e.ck;
+
+      if(e.mac!==undefined && e.macchine===undefined)
+        e.macchine=e.mac;
+
+      e.ricavo=Number(e.ricavo)||0;
+      e.altreSpese=Number(e.altreSpese)||0;
+      e.materiali=Number(e.materiali)||0;
+      e.ore=Number(e.ore)||0;
+      e.costoOra=Number(e.costoOra)||0;
+      e.km=Number(e.km)||0;
+      e.costoKm=Number(e.costoKm)||0;
+      e.macchine=Number(e.macchine)||0;
+
+    });
+
+  });
+
+}
+
+
+normalizza();
+salva();
+
 
 function nuovoCantiere(){
-let n=document.getElementById("nome").value.trim();
-if(!n)return alert("Inserisci il nome del cantiere");
-let c={
-id:Date.now(),
-nome:n,
-cliente:document.getElementById("cliente").value,
-indirizzo:document.getElementById("indirizzo").value,
-extra:[]
-};
-dati.push(c);salva();
-document.getElementById("nome").value="";
-document.getElementById("cliente").value="";
-document.getElementById("indirizzo").value="";
-mostraLista();
-apri(c.id);
+
+  const n =
+    document.getElementById("nome")
+    .value
+    .trim();
+
+  if(!n){
+
+    alert(
+      "Inserisci il nome del cantiere"
+    );
+
+    return;
+
+  }
+
+
+  const c = {
+
+    id:Date.now(),
+
+    nome:n,
+
+    cliente:
+      document
+      .getElementById("cliente")
+      .value
+      .trim(),
+
+    indirizzo:
+      document
+      .getElementById("indirizzo")
+      .value
+      .trim(),
+
+    preventivo:num("preventivo"),
+
+    variazioni:0,
+
+    extra:[],
+
+    spese:[]
+
+  };
+
+
+  dati.push(c);
+
+  salva();
+
+
+  [
+    "nome",
+    "cliente",
+    "indirizzo",
+    "preventivo"
+  ].forEach(
+    x=>{
+      document.getElementById(x).value="";
+    }
+  );
+
+
+  mostraLista();
+
+  apri(c.id);
+
 }
+
+
+function calcola(c){
+
+  const base =
+    (Number(c.preventivo)||0) +
+    (Number(c.variazioni)||0);
+
+
+  const extraRicavi =
+    c.extra.reduce(
+      (s,e)=>
+        s+(Number(e.ricavo)||0),
+      0
+    );
+
+
+  const extraCosti =
+    c.extra.reduce(
+      (s,e)=>
+        s+totaleSpeseExtra(e),
+      0
+    );
+
+
+  const altre =
+    c.spese.reduce(
+      (s,e)=>
+        s+(Number(e.importo)||0),
+      0
+    );
+
+
+  const spese =
+    extraCosti + altre;
+
+
+  const ricavi =
+    base + extraRicavi;
+
+
+  return {
+
+    base,
+
+    extraRicavi,
+
+    extraCosti,
+
+    altre,
+
+    spese,
+
+    ricavi,
+
+    guadagno:
+      ricavi-spese,
+
+    margine:
+      ricavi
+      ? (ricavi-spese)/ricavi*100
+      : 0
+
+  };
+
+}
+
 
 function mostraLista(){
-let l=document.getElementById("lista");
-if(!dati.length){l.innerHTML="<p class='small'>Nessun cantiere presente.</p>";return}
-l.innerHTML=dati.map(c=>`
-<div class="extra">
-<b>${c.nome}</b><br>
-<span class="small">${c.cliente||""} ${c.indirizzo?"• "+c.indirizzo:""}</span><br>
-<button onclick="apri(${c.id})">Apri</button>
-</div>`).join("");
+
+  const l =
+    document.getElementById("lista");
+
+
+  if(!dati.length){
+
+    l.innerHTML =
+      "<p class='small'>Nessun cantiere presente.</p>";
+
+  }
+
+  else{
+
+    l.innerHTML =
+      dati.map(c=>{
+
+        const x=calcola(c);
+
+
+        return `
+
+        <div class="item">
+
+          <b>${esc(c.nome)}</b>
+
+          <br>
+
+          <span class="small">
+
+            ${esc(c.cliente||"")}
+
+            ${c.indirizzo
+              ?" • "+esc(c.indirizzo)
+              :""
+            }
+
+          </span>
+
+          <br>
+
+          <span class="badge">
+            Ricavi ${euro(x.ricavi)}
+          </span>
+
+          <span class="badge">
+            Spese ${euro(x.spese)}
+          </span>
+
+          <div>
+
+            <b>
+              Guadagno: ${euro(x.guadagno)}
+            </b>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              onclick="apri(${c.id})"
+            >
+              Apri
+            </button>
+
+          </div>
+
+        </div>
+
+        `;
+
+      }).join("");
+
+  }
+
+
+  let r=0;
+  let s=0;
+  let g=0;
+
+
+  dati.forEach(c=>{
+
+    let x=calcola(c);
+
+    r+=x.ricavi;
+    s+=x.spese;
+    g+=x.guadagno;
+
+  });
+
+
+  document.getElementById(
+    "homeRicavi"
+  ).textContent=euro(r);
+
+
+  document.getElementById(
+    "homeSpese"
+  ).textContent=euro(s);
+
+
+  document.getElementById(
+    "homeGuadagno"
+  ).textContent=euro(g);
+
+
+  document.getElementById(
+    "homeCantieri"
+  ).textContent=dati.length;
+
 }
+
 
 function apri(id){
-corrente=dati.find(c=>c.id===id);
-document.getElementById("home").classList.add("hidden");
-document.getElementById("cantiere").classList.remove("hidden");
-document.getElementById("titolo").textContent=corrente.nome;
-document.getElementById("info").textContent=
-(corrente.cliente||"")+(corrente.indirizzo?" • "+corrente.indirizzo:"");
-mostraExtra();
+
+  corrente =
+    dati.find(
+      c=>c.id===id
+    );
+
+
+  if(!corrente)
+    return;
+
+
+  document
+    .getElementById("home")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("cantiere")
+    .classList
+    .remove("hidden");
+
+
+  document.getElementById(
+    "editNome"
+  ).value =
+    corrente.nome||"";
+
+
+  document.getElementById(
+    "editCliente"
+  ).value =
+    corrente.cliente||"";
+
+
+  document.getElementById(
+    "editIndirizzo"
+  ).value =
+    corrente.indirizzo||"";
+
+
+  document.getElementById(
+    "editPreventivo"
+  ).value =
+    corrente.preventivo||"";
+
+
+  document.getElementById(
+    "editVariazioni"
+  ).value =
+    corrente.variazioni||"";
+
+
+  aggiornaSchermata();
+
 }
+
+
+function aggiornaSchermata(){
+
+  document.getElementById(
+    "titolo"
+  ).textContent =
+    corrente.nome;
+
+
+  document.getElementById(
+    "sottotitolo"
+  ).textContent =
+    (corrente.cliente||"") +
+    (
+      corrente.indirizzo
+      ? " • "+corrente.indirizzo
+      : ""
+    );
+
+
+  mostraExtra();
+  mostraSpese();
+  mostraRiepilogo();
+
+}
+
+
+function salvaDatiCantiere(){
+
+  corrente.nome =
+    document
+    .getElementById("editNome")
+    .value
+    .trim()
+    ||
+    corrente.nome;
+
+
+  corrente.cliente =
+    document
+    .getElementById("editCliente")
+    .value
+    .trim();
+
+
+  corrente.indirizzo =
+    document
+    .getElementById("editIndirizzo")
+    .value
+    .trim();
+
+
+  salva();
+
+  aggiornaSchermata();
+
+  mostraLista();
+
+}
+
+
+function aggiornaPreventivo(){
+
+  corrente.preventivo =
+    num("editPreventivo");
+
+  salva();
+
+  mostraRiepilogo();
+
+  mostraLista();
+
+}
+
+
+function aggiornaVariazioni(){
+
+  corrente.variazioni =
+    num("editVariazioni");
+
+  salva();
+
+  mostraRiepilogo();
+
+  mostraLista();
+
+}
+
 
 function aggiungiExtra(){
-let d=document.getElementById("descrizione").value.trim();
-if(!d)return alert("Inserisci la descrizione");
-let m=+document.getElementById("materiali").value||0;
-let o=+document.getElementById("ore").value||0;
-let co=+document.getElementById("costoOra").value||0;
-let km=+document.getElementById("km").value||0;
-let ck=+document.getElementById("costoKm").value||0;
-let mac=+document.getElementById("macchine").value||0;
-let totale=m+(o*co)+(km*ck)+mac;
-corrente.extra.push({d,m,o,co,km,ck,mac,totale});
-salva();
-["descrizione","materiali","ore","costoOra","km","costoKm","macchine"]
-.forEach(x=>document.getElementById(x).value="");
-mostraExtra();
+
+  const d =
+    document
+    .getElementById("exDescrizione")
+    .value
+    .trim();
+
+
+  if(!d){
+
+    alert(
+      "Inserisci la descrizione dell'extra"
+    );
+
+    return;
+
+  }
+
+
+  const e={
+
+    id:Date.now(),
+
+    descrizione:d,
+
+    ricavo:num("exRicavo"),
+
+    materiali:num("exMateriali"),
+
+    ore:num("exOre"),
+
+    costoOra:num("exCostoOra"),
+
+    km:num("exKm"),
+
+    costoKm:num("exCostoKm"),
+
+    macchine:num("exMacchine"),
+
+    altreSpese:num("exAltreSpese")
+
+  };
+
+
+  corrente.extra.push(e);
+
+  salva();
+
+
+  [
+
+    "exDescrizione",
+    "exRicavo",
+    "exMateriali",
+    "exOre",
+    "exCostoOra",
+    "exKm",
+    "exCostoKm",
+    "exMacchine",
+    "exAltreSpese"
+
+  ].forEach(
+    x=>{
+      document.getElementById(x).value="";
+    }
+  );
+
+
+  aggiornaSchermata();
+
+  mostraLista();
+
 }
+
 
 function mostraExtra(){
-let box=document.getElementById("extra");
-let tot=0;
-if(!corrente.extra.length)box.innerHTML="<p class='small'>Nessun extra inserito.</p>";
-else{
-box.innerHTML=corrente.extra.map((e,i)=>{
-tot+=e.totale;
-return `<div class="extra">
-<b>${e.d}</b><br>
-<span class="small">Materiali €${e.m.toFixed(2)} • Lavoro €${(e.o*e.co).toFixed(2)} • Trasporto €${(e.km*e.ck).toFixed(2)} • Macchinari €${e.mac.toFixed(2)}</span><br>
-<b>€ ${e.totale.toFixed(2)}</b>
-</div>`}).join("");
+
+  const box =
+    document.getElementById("extra");
+
+
+  if(!corrente.extra.length){
+
+    box.innerHTML =
+      "<p class='small'>Nessun extra inserito.</p>";
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    corrente.extra.map(
+      (e,i)=>{
+
+        const costo =
+          totaleSpeseExtra(e);
+
+
+        const utile =
+          (Number(e.ricavo)||0)
+          - costo;
+
+
+        return `
+
+        <div class="item">
+
+          <b>
+            ${esc(e.descrizione)}
+          </b>
+
+          <div class="small">
+
+            Ricavo extra:
+            ${euro(e.ricavo)}
+
+            • Costi:
+            ${euro(costo)}
+
+            • Guadagno:
+            ${euro(utile)}
+
+          </div>
+
+          <div class="small">
+
+            Materiali
+            ${euro(e.materiali)}
+
+            • Lavoro
+            ${euro(
+              (e.ore||0)*
+              (e.costoOra||0)
+            )}
+
+            • Km
+            ${euro(
+              (e.km||0)*
+              (e.costoKm||0)
+            )}
+
+            • Macchinari
+            ${euro(e.macchine)}
+
+            • Altre
+            ${euro(e.altreSpese)}
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="light"
+              onclick="modificaExtra(${i})"
+            >
+              Modifica
+            </button>
+
+            <button
+              class="red"
+              onclick="eliminaExtra(${i})"
+            >
+              Elimina
+            </button>
+
+          </div>
+
+        </div>
+
+        `;
+
+      }
+    ).join("");
+
 }
-document.getElementById("totale").textContent=tot.toFixed(2);
+
+
+function modificaExtra(i){
+
+  const e =
+    corrente.extra[i];
+
+
+  const d =
+    prompt(
+      "Descrizione",
+      e.descrizione
+    );
+
+  if(d===null)
+    return;
+
+
+  const r =
+    prompt(
+      "Importo da fatturare (€)",
+      e.ricavo
+    );
+
+  if(r===null)
+    return;
+
+
+  const m =
+    prompt(
+      "Materiali (€)",
+      e.materiali
+    );
+
+  if(m===null)
+    return;
+
+
+  const o =
+    prompt(
+      "Ore lavoro",
+      e.ore
+    );
+
+  if(o===null)
+    return;
+
+
+  const co =
+    prompt(
+      "Costo €/ora",
+      e.costoOra
+    );
+
+  if(co===null)
+    return;
+
+
+  const km =
+    prompt(
+      "Km",
+      e.km
+    );
+
+  if(km===null)
+    return;
+
+
+  const ck =
+    prompt(
+      "Costo €/km",
+      e.costoKm
+    );
+
+  if(ck===null)
+    return;
+
+
+  const mac =
+    prompt(
+      "Macchinari (€)",
+      e.macchine
+    );
+
+  if(mac===null)
+    return;
+
+
+  const alt =
+    prompt(
+      "Altre spese (€)",
+      e.altreSpese
+    );
+
+  if(alt===null)
+    return;
+
+
+  Object.assign(
+    e,
+    {
+
+      descrizione:d,
+
+      ricavo:Number(r)||0,
+
+      materiali:Number(m)||0,
+
+      ore:Number(o)||0,
+
+      costoOra:Number(co)||0,
+
+      km:Number(km)||0,
+
+      costoKm:Number(ck)||0,
+
+      macchine:Number(mac)||0,
+
+      altreSpese:Number(alt)||0
+
+    }
+  );
+
+
+  salva();
+
+  aggiornaSchermata();
+
+  mostraLista();
+
 }
+
+
+function eliminaExtra(i){
+
+  if(
+    confirm(
+      "Eliminare questo extra?"
+    )
+  ){
+
+    corrente.extra.splice(i,1);
+
+    salva();
+
+    aggiornaSchermata();
+
+    mostraLista();
+
+  }
+
+}
+
+
+function aggiungiSpesa(){
+
+  const d =
+    document
+    .getElementById("spDescrizione")
+    .value
+    .trim();
+
+
+  const v =
+    num("spImporto");
+
+
+  if(!d){
+
+    alert(
+      "Inserisci la descrizione della spesa"
+    );
+
+    return;
+
+  }
+
+
+  corrente.spese.push({
+
+    id:Date.now(),
+
+    descrizione:d,
+
+    importo:v
+
+  });
+
+
+  salva();
+
+
+  document.getElementById(
+    "spDescrizione"
+  ).value="";
+
+
+  document.getElementById(
+    "spImporto"
+  ).value="";
+
+
+  aggiornaSchermata();
+
+  mostraLista();
+
+}
+
+
+function mostraSpese(){
+
+  const box =
+    document.getElementById("spese");
+
+
+  if(!corrente.spese.length){
+
+    box.innerHTML =
+      "<p class='small'>Nessuna altra spesa.</p>";
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    corrente.spese.map(
+      (s,i)=>`
+
+      <div class="item">
+
+        <b>
+          ${esc(s.descrizione)}
+        </b>
+
+        —
+        ${euro(s.importo)}
+
+        <div class="actions">
+
+          <button
+            class="light"
+            onclick="modificaSpesa(${i})"
+          >
+            Modifica
+          </button>
+
+          <button
+            class="red"
+            onclick="eliminaSpesa(${i})"
+          >
+            Elimina
+          </button>
+
+        </div>
+
+      </div>
+
+      `
+    ).join("");
+
+}
+
+
+function modificaSpesa(i){
+
+  const s =
+    corrente.spese[i];
+
+
+  const d =
+    prompt(
+      "Descrizione",
+      s.descrizione
+    );
+
+  if(d===null)
+    return;
+
+
+  const v =
+    prompt(
+      "Importo (€)",
+      s.importo
+    );
+
+  if(v===null)
+    return;
+
+
+  s.descrizione=d;
+
+  s.importo=
+    Number(v)||0;
+
+
+  salva();
+
+  aggiornaSchermata();
+
+  mostraLista();
+
+}
+
+
+function eliminaSpesa(i){
+
+  if(
+    confirm(
+      "Eliminare questa spesa?"
+    )
+  ){
+
+    corrente.spese.splice(i,1);
+
+    salva();
+
+    aggiornaSchermata();
+
+    mostraLista();
+
+  }
+
+}
+
+
+function mostraRiepilogo(){
+
+  const x =
+    calcola(corrente);
+
+
+  document.getElementById(
+    "riepBase"
+  ).textContent =
+    euro(x.base);
+
+
+  document.getElementById(
+    "riepExtraRicavi"
+  ).textContent =
+    euro(x.extraRicavi);
+
+
+  document.getElementById(
+    "riepRicavi"
+  ).textContent =
+    euro(x.ricavi);
+
+
+  document.getElementById(
+    "riepSpese"
+  ).textContent =
+    euro(x.spese);
+
+
+  document.getElementById(
+    "riepGuadagno"
+  ).textContent =
+    euro(x.guadagno);
+
+
+  document.getElementById(
+    "riepMargine"
+  ).textContent =
+    "Margine: "+
+    x.margine.toFixed(1)+
+    "%";
+
+
+  const b =
+    document.getElementById(
+      "boxGuadagno"
+    );
+
+
+  b.classList.toggle(
+    "loss",
+    x.guadagno<0
+  );
+
+
+  b.classList.toggle(
+    "profit",
+    x.guadagno>=0
+  );
+
+}
+
+
+function eliminaCantiere(){
+
+  if(
+    !confirm(
+      "Eliminare definitivamente questo cantiere e tutti i suoi dati?"
+    )
+  )
+    return;
+
+
+  dati =
+    dati.filter(
+      c=>c.id!==corrente.id
+    );
+
+
+  corrente=null;
+
+  salva();
+
+  home();
+
+}
+
 
 function home(){
-document.getElementById("cantiere").classList.add("hidden");
-document.getElementById("home").classList.remove("hidden");
-mostraLista();
+
+  document
+    .getElementById("cantiere")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("home")
+    .classList
+    .remove("hidden");
+
+
+  mostraLista();
+
 }
 
+
+function esc(v){
+
+  return String(v??"")
+    .replace(
+      /[&<>"']/g,
+      m=>({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+      }[m])
+    );
+
+}
+
+
 mostraLista();
+
 </script>
+
 </body>
 </html>
