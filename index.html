@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestionale Edilizia</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f2f2f7;color:#111}
+header{background:#111;color:white;padding:25px 20px 20px;font-size:28px;font-weight:700}
+main{padding:18px;max-width:700px;margin:auto}
+.card{background:white;border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+h2{margin:0 0 15px}input,select{width:100%;padding:13px;margin:6px 0 10px;border:1px solid #ddd;border-radius:10px;font-size:16px}
+button{border:0;border-radius:12px;padding:13px 18px;font-size:16px;font-weight:600;background:#111;color:white;margin-top:5px}
+.green{background:#299447}.red{background:#d33}.back{background:#777}
+.total{font-size:25px;font-weight:700;margin-top:10px}.extra{border-top:1px solid #eee;padding:12px 0}
+.small{color:#666;font-size:14px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>Gestionale Edilizia</header>
+
+<main>
+
+<section id="home">
+<div class="card">
+<h2>🏗️ Nuovo cantiere</h2>
+<input id="nome" placeholder="Nome cantiere">
+<input id="cliente" placeholder="Cliente">
+<input id="indirizzo" placeholder="Indirizzo">
+<button class="green" onclick="nuovoCantiere()">+ Crea cantiere</button>
+</div>
+
+<div class="card">
+<h2>📋 I miei cantieri</h2>
+<div id="lista"></div>
+</div>
+</section>
+
+<section id="cantiere" class="hidden">
+<button class="back" onclick="home()">← Cantieri</button>
+
+<div class="card">
+<h2 id="titolo"></h2>
+<div id="info" class="small"></div>
+</div>
+
+<div class="card">
+<h2>➕ Lavorazione extra</h2>
+<input id="descrizione" placeholder="Descrizione lavorazione">
+<input id="materiali" type="number" step="0.01" placeholder="Materiali €">
+<input id="ore" type="number" step="0.1" placeholder="Ore lavoro">
+<input id="costoOra" type="number" step="0.01" placeholder="Costo €/ora">
+<input id="km" type="number" step="0.1" placeholder="Km">
+<input id="costoKm" type="number" step="0.01" placeholder="Costo €/km">
+<input id="macchine" type="number" step="0.01" placeholder="Macchinari €">
+<button class="green" onclick="aggiungiExtra()">+ Aggiungi extra</button>
+</div>
+
+<div class="card">
+<h2>💰 Riepilogo</h2>
+<div id="extra"></div>
+<div class="total">Totale: € <span id="totale">0.00</span></div>
+</div>
+</section>
+
+</main>
+
+<script>
+let dati=JSON.parse(localStorage.getItem("cantieri")||"[]");
+let corrente=null;
+
+function salva(){localStorage.setItem("cantieri",JSON.stringify(dati));}
+
+function nuovoCantiere(){
+let n=document.getElementById("nome").value.trim();
+if(!n)return alert("Inserisci il nome del cantiere");
+let c={
+id:Date.now(),
+nome:n,
+cliente:document.getElementById("cliente").value,
+indirizzo:document.getElementById("indirizzo").value,
+extra:[]
+};
+dati.push(c);salva();
+document.getElementById("nome").value="";
+document.getElementById("cliente").value="";
+document.getElementById("indirizzo").value="";
+mostraLista();
+apri(c.id);
+}
+
+function mostraLista(){
+let l=document.getElementById("lista");
+if(!dati.length){l.innerHTML="<p class='small'>Nessun cantiere presente.</p>";return}
+l.innerHTML=dati.map(c=>`
+<div class="extra">
+<b>${c.nome}</b><br>
+<span class="small">${c.cliente||""} ${c.indirizzo?"• "+c.indirizzo:""}</span><br>
+<button onclick="apri(${c.id})">Apri</button>
+</div>`).join("");
+}
+
+function apri(id){
+corrente=dati.find(c=>c.id===id);
+document.getElementById("home").classList.add("hidden");
+document.getElementById("cantiere").classList.remove("hidden");
+document.getElementById("titolo").textContent=corrente.nome;
+document.getElementById("info").textContent=
+(corrente.cliente||"")+(corrente.indirizzo?" • "+corrente.indirizzo:"");
+mostraExtra();
+}
+
+function aggiungiExtra(){
+let d=document.getElementById("descrizione").value.trim();
+if(!d)return alert("Inserisci la descrizione");
+let m=+document.getElementById("materiali").value||0;
+let o=+document.getElementById("ore").value||0;
+let co=+document.getElementById("costoOra").value||0;
+let km=+document.getElementById("km").value||0;
+let ck=+document.getElementById("costoKm").value||0;
+let mac=+document.getElementById("macchine").value||0;
+let totale=m+(o*co)+(km*ck)+mac;
+corrente.extra.push({d,m,o,co,km,ck,mac,totale});
+salva();
+["descrizione","materiali","ore","costoOra","km","costoKm","macchine"]
+.forEach(x=>document.getElementById(x).value="");
+mostraExtra();
+}
+
+function mostraExtra(){
+let box=document.getElementById("extra");
+let tot=0;
+if(!corrente.extra.length)box.innerHTML="<p class='small'>Nessun extra inserito.</p>";
+else{
+box.innerHTML=corrente.extra.map((e,i)=>{
+tot+=e.totale;
+return `<div class="extra">
+<b>${e.d}</b><br>
+<span class="small">Materiali €${e.m.toFixed(2)} • Lavoro €${(e.o*e.co).toFixed(2)} • Trasporto €${(e.km*e.ck).toFixed(2)} • Macchinari €${e.mac.toFixed(2)}</span><br>
+<b>€ ${e.totale.toFixed(2)}</b>
+</div>`}).join("");
+}
+document.getElementById("totale").textContent=tot.toFixed(2);
+}
+
+function home(){
+document.getElementById("cantiere").classList.add("hidden");
+document.getElementById("home").classList.remove("hidden");
+mostraLista();
+}
+
+mostraLista();
+</script>
+</body>
+</html>
